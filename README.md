@@ -2,7 +2,7 @@
   <img src="images/adamw.png" alt="Colorado Technical University Seal" width="600">
 </p>
 
-# Data Science Info - Shared Computer Science and Data Science Knowledge Base
+# Shared Computer Science and Data Science Knowledge Base
 
 This repository is a continuously growing collection of notes, explanations, code snippets, and reference material gathered throughout academic studies and professional work in computer science, data science, and machine learning.
 
