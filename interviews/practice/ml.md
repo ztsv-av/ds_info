@@ -40,6 +40,7 @@ df2 = pd.DataFrame({'Key': ['A', 'B', 'D'],
 merged_df = pd.merge(df1, df2, on='Key', how='inner')
 # inner, outer, left, right
 ```
+
 - `join()`: Combines DataFrames based on index.
 
 ```
@@ -85,7 +86,7 @@ df.shift(1)             # Shift rows by 1
 
 ## MultiIndexing
 
-andas allows hierarchical indexing (MultiIndex) for working with more complex data.
+Pandas allows hierarchical indexing (MultiIndex) for working with more complex data.
 
 ```
 arrays = [['A', 'A', 'B', 'B'], [1, 2, 1, 2]]

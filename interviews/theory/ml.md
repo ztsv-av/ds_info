@@ -6,3 +6,19 @@
 4. Deployment: After a model is developed, it needs to be made accessible to users.
 5. Monitoring and maintenance: Once in production, models need to be monitored for performance decay and maintained/updated to be adaptive to changing environments and changing requirements.
 6. Business analysis: Model performance needs to be evaluated against business goals and analyzed to generate business insights. These insights can then be used to eliminate unproductive projects or scope out new projects.
+
+# Zero-shot, One-shot, Few-shot Learning
+
+Zero-shot, one-shot, and few-shot learning describe how a model performs a task using zero, one, or a few examples in the input prompt, without any additional training.
+
+# Attention
+
+- Self-attention vs recurrent: Recurrent models cannot see future tokens because the math is recursive in time (h*t = f(h*{t−1}, x_t)); self-attention removes time recursion and replaces it with direct pairwise interactions between all tokens (output = AV = softmax( QKᵀ / sqrt(d) ), Q = X W_Q, K = X W_K, V = X W_V, X = [x_1, x_2, …, x_n])
+- Self-attention: learns how each element in the sequence is connected with all other elements in the sequence by computing weighted combinations of their representations.
+- Cross-attention: learns how elements of one sequence attend (connected) to elements of another sequence, typically used to connect an input sequence to an output sequence.
+- Multi-head self-attention: runs multiple self-attention operations in parallel with different learned projections, allowing the model to capture different types of relationships (e.g. syntactic, semantic, positional) at the same time.
+
+чем селф отличается от рекурентной логики.
+self attention как каждый элемент последовательности связан со всеми остальными.
+что такое мульти хэд селф аттенш.
+cross attention как элементы одной последовательности связаны со всеми элементами другой

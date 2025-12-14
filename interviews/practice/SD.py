@@ -1,4 +1,8 @@
-# 1. TOP K Frequent Elements
+# BFS, DFS
+
+
+
+# ----------- TOP K Frequent Elements -----------
 
 # Given an integer array nums and an integer k,
 # return the k most frequent elements.
@@ -59,7 +63,7 @@ def topKFrequent(nums, k):
     return [num for freq, num in heap]
 
 
-# 2. Two Sum
+# ----------- Two Sum -----------
 # Given an array of integers nums and an integer target,
 # return the indices of the two numbers such that they add up to target.
 # Assume exactly one solution
@@ -76,7 +80,7 @@ def twoSum(nums, target):
         seen[num] = i
 
 
-# 3. Three Sum (Medium)
+# ----------- Three Sum (Medium) -----------
 # Given an array nums,
 # return all unique triplets [a, b, c] such that:
 # a + b + c == 0
@@ -111,7 +115,7 @@ def threeSum(nums):
     return result
 
 
-# 4. Longest Substring Without Repeating Characters
+# ----------- Longest Substring Without Repeating Characters -----------
 # Given a string s,
 # find the length of the longest substring without repeating characters
 # O(n), O(k), where k is the character set
@@ -132,7 +136,7 @@ def lengthOfLongestSubstring(s):
     return max_len
 
 
-# 5. Hash Array
+# ----------- Hash Array -----------
 # Given an array param of size n,
 # you need to create an array secretKey of size n,
 # where each element is any integer
@@ -155,7 +159,7 @@ def computeMaxDistinctHash(param):
     return unique
 
 
-# 6. Remove character, is string a polyndrome?
+# ----------- Remove character, is string a polyndrome? -----------
 # Compute prefix hashes of the original string (so you can get any substring’s hash in O(1)).
 # Compute prefix hashes of the reversed string for the same reason.
 # For each index i in the string:
@@ -220,7 +224,7 @@ def countRemovableIndices(s: str) -> int:
     return cnt
 
 
-# 7. Count anagramic pairs
+# ----------- Count anagramic pairs -----------
 # Let’s take: s = "abba"
 # All substrings:
 #   a, b, b, a, ab, bb, ba, abb, bba, abba
@@ -257,7 +261,7 @@ def count_anagrammatic_pairs(s):
     return count
 
 
-# 8. Longest Subarray with Equal Number of 0s and 1s
+# ----------- Longest Subarray with Equal Number of 0s and 1s -----------
 # Given a binary array (only 0s and 1s),
 # find the length of the longest contiguous subarray with equal number of 0s and 1s.
 # Example:
