@@ -1,38 +1,3 @@
-# BFS, DFS
-
-def dfs(graph, start, type, visited=None):
-    if type == "stack":
-        visited = set()
-        stack = [start]
-        while stack:
-            node = stack.pop()  # last element
-            if node not in visited:
-                visited.add(node)
-                stack.extend(reversed(graph[node]))  # reverse to pop first neighbor
-    elif type == "recursive":
-        if visited is None:
-            visited = set()
-        visited.add(start)
-        for neighbor in graph[start]:
-            if neighbor not in visited:
-                dfs(graph, neighbor, visited)
-    return visited
-
-def bfs(graph, start):
-
-    from collections import deque
-
-    visited = set([start])
-    queue = deque([start])
-
-    while queue:
-        node = queue.popleft()
-        for neighbor in graph[node]:
-            if neighbor not in visited:
-                visited.add(neighbor)
-                queue.append(neighbor)
-    return visited
-
 # ----------- TOP K Frequent Elements -----------
 
 # Given an integer array nums and an integer k,
