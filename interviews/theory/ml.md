@@ -88,6 +88,70 @@ In theory it's true, but in practice it doesn't work like that.
 3. [M] Explain algorithm for tuning hyperparameters.
    1. We define a validation metric and search over hyperparameter values using methods such as grid search or random search. More advanced methods like Bayesian optimization or successive halving evaluate configurations iteratively and stop poorly performing ones early to save computation.
 
+# Classification vs. Regression
+
+1. [E] What makes a classification problem different from a regression problem?
+   1. Targets, loss function, model head. Classification models predict discrete, categorical labels. Regression models predict continious values.
+2. [E] Can a classification problem be turned into a regression problem and vice versa?
+   1. Yes, but usually that wouldn't make it more efficient. For example, we can turn labels 1, 2, ... into continious values and make regression model predict them. However, in case of classes, class 1 and class 2 are different instances, while in regression task, 2.0 is 2 times higher than 1.0, which wouldn't make sense in classification. To turn regression into classification, we can put labels into bins, e.g. 1-2 into bin 1, 2-3 into bin 2, etc.
+
+# Parametric vs. Non-parametric Methods
+
+1. [E] What’s the difference between parametric methods and non-parametric methods? Give an example of each method.
+   1. Parametric methods assume a specific functional form for the data distribution or the relationship between inputs and outputs. They are characterized by a fixed, finite set of parameters whose number does not grow with the amount of data. E.g. linear regression, neural networks. Non-parametric methods do not assume a fixed functional form. Model complexity can grow with the amount of data, allowing them to adapt more flexibly to the underlying structure. Examples are decision trees (can grow in depth and number of nodes as more data is available), kernel density estimation, KNN.
+2. [H] When should we use one and when should we use the other?
+   1. Parametric:
+      1. You have limited data and want to avoid overfitting.
+      2. The relationship is approximately known or can be reasonably assumed.
+      3. Interpretability and computational efficiency are important.
+   2. Non-parametric:
+      1. No assumptions about data distribution.
+      2. The relationship function is complex or unknown.
+      3. Predictive performance is prioritized over interpretability and memory usage.
+
+# [M] Why does ensembling independently trained models generally improve performance?
+
+Ensembling independently trained models improves performance because it changes the bias–variance–covariance structure of the predictor. For a fixed input, the expected squared error of an ensemble average decomposes into the average individual model variance minus the average pairwise covariance of their errors. When models are trained with different random seeds, data subsamples, architectures, or optimization trajectories, their errors are only partially correlated. Averaging therefore cancels individual errors while preserving signal, reducing variance more than it reduces bias.
+
+In modern deep learning, independently trained networks often converge to different regions of the loss landscape that encode different inductive biases. Averaging their predictions effectively aggregates multiple hypotheses, smoothing sharp decision boundaries and sometimes lowering bias as well. Overall, the ensemble’s error is typically lower than that of any voter model because it benefits from reduced variance, reduced error correlation, and mild bias correction.
+
+# [E] Why does an ML model’s performance degrade in production?
+
+A production model degrades because the real-world data and conditions gradually diverge from those seen during training. This includes model staleness from new patterns not present in training, data drift (feature distribution shift), label drift (only distribution of the target variable changes over time), concept drift (mapping from features to labels changes), pipeline inconsistencies, and feedback loops (e.g. user-behavior changes). As the mapping from inputs to outputs changes, the model’s learned decision boundary becomes outdated. Effective mitigation requires monitoring, drift detection, and periodic retraining, not continuous fine-tuning in production.
+
+# [M] Why does L1 regularization tend to lead to sparsity while L2 regularization pushes weights closer to 0?
+
+L1 and L2 regularization correspond to constraining the weight vector $w$ to lie inside a ball under the L1 or L2 norm.
+
+L1 regularization leads to sparsity because its penalty term $|w|_1$ has a constant subgradient almost everywhere. This creates a "kink" at zero, so during optimization the gradient does not diminish as weights get small. As a result, many weights are driven exactly to zero since the optimal solution often lies on the corners of the L1 ball, which correspond to sparse vectors. L1 ball corners lie directly where axis are 0. Thus, the optimization drives towards these corners.
+
+$$
+L(w) = L_0(w) + \lambda \sum_i |w_i|
+\text{Subgradient: }  \delta|w_i| = sign(w_i) \text{for} w_i \neq 0 \text{and any value in} [−1, 1] \text{at} w_i = 0
+$$
+
+L2 regularization uses the smooth penalty $|w|_2^2$, whose gradient shrinks linearly with the weight magnitude. As weights approach zero, the penalty gradient becomes small, pulling weights continuously toward zero but not forcing them to cross zero. The L2 constraint ball is round, so the optimum rarely lies on axes, meaning weights become small but typically remain nonzero. L2 ball doesn't have cornerns, it's round (circle or sphere in higher dimensions). Thus, driving towards where axis = 0 is pointless.
+
+$$
+L(w) = L_0(w) + \lambda \sum_i w_i^2
+\text{Subgradient: } \delta(w_i^2) = 2 w_i.
+$$
+
+# [M] What problems might we run into when deploying large machine learning models?
+
+Overall, deploying large models creates bottlenecks in compute, memory, cost, latency, reliability, monitoring, and operational agility.
+
+Deploying large machine learning models introduces challenges in latency, memory footprint, and compute requirements. High parameter counts increase inference time, strain accelerator resources, and may exceed available RAM or VRAM budgets. Scaling the serving infrastructure requires expensive hardware, specialized runtimes, and careful batching to maintain throughput. Also, understanding the limit of models calls might become an issue as we might run into problems as this number of parallel calls increases:
+
+- Set a hard max concurrent requests per model server instance (reject or queue after the limit).
+- Run many replicas of the model server behind a load balancer.
+- Per-request overhead is high; small requests waste GPU throughput: Accumulate requests for a few milliseconds, run them as one big batch through the model, split responses back to callers.
+- Model optimization.
+
+Large models also complicate reliability: they are more sensitive to numerical stability issues, have complex dependency chains, and may produce unpredictable outputs under distribution shift. Monitoring becomes harder because debugging thousands of layers, attention heads, or expert routes is nontrivial, and collecting sufficient production telemetry is expensive.
+
+Model files can be gigabytes in size, slowing rollout (new model version deployment) and making versioning and rollback cumbersome. Updating weights risks incompatibilities across hardware backends. Cold starts, autoscaling, and multi-region deployment become costly due to long load times and high energy consumption.
+
 # [E] Zero-shot, One-shot, Few-shot Learning
 
 Zero-shot, one-shot, and few-shot learning describe how a model performs a task using zero, one, or a few examples in the input prompt, without any additional training.
@@ -98,3 +162,39 @@ Zero-shot, one-shot, and few-shot learning describe how a model performs a task 
 - Self-attention: learns how each element in the sequence is connected with all other elements in the sequence by computing weighted combinations of their representations.
 - Cross-attention: learns how elements of one sequence attend (connected) to elements of another sequence, typically used to connect an input sequence to an output sequence.
 - Multi-head self-attention: runs multiple self-attention operations in parallel with different learned projections, allowing the model to capture different types of relationships (e.g. syntactic, semantic, positional) at the same time.
+
+# Your model performs really well on the test set but poorly in production.
+
+- [M] What are your hypotheses about the causes?
+- [H] How do you validate whether your hypotheses are correct?
+- [M] Imagine your hypotheses about the causes are correct. What would you do to address them?
+
+# [H] Why transformers replace CNNs?
+
+CNNs take input image, process it using convolutional layers and pooling layers. Convolutional layers process input data using filters (=kernels), e.g. 3x3 filter. CNN layer takes an input, processes 3x3 area of the input using weights of the filter and outputs 1x1 pixel. Each layer can have many of those filters, they are dimensions. For example, RGB image has 3 dimensions. First layer in CNN can have 4 kernels, each dimension representing input differently, e.g. 1st dim focusing on vertical shapes, 2nd dim focusing on horizontal shapes, etc. The deeper in the network, the less general features become (from shapes to details, such as eyes, lips).
+
+CNNs process images in a very specific way. They have **INDUCTIVE BIAS**. Models with high inductive bias make strong assumptions about the nature of the input data, which limits the function space that they can explore during training. On one hand it's good, because we manually prooning out bad function spaces, but we can also unwantedly exclude bad function spaces. CNN assumptions:
+
+1. Locality: Pixels can only affect local neighborhood (that's why it's hard for them to classify a cat with feathers as a cat, rather than a bird). CNNs prioritize texture, over overall object structure. **IMPORANT**: As CNNs depth grows, so does the neighborhood, so, in some sense, locality should not be a problem, but that's indirect path, no direct link between bottom left pixel and top right pixel , or **attention**.
+2. Translation invariance: Consider a kernel that detects eyes. As it slides over an image, it looks for the same visual element over the whole image. It's aknowledging that an object can be present in any location in the image.
+3. Hierarchical structure: CNNs start with local features, as it goes deep, towards complex, abstract representations. It should battle locality, but not always.
+
+Transformers have much lower bias, and much higher variance, owing to self-attention. Self-attention is as follows:
+
+1.  It takes an image.
+2.  Takes a pixel, call it query pixel $p_q$
+3.  It considers all pixels in the image, called key pixels $p_k$
+4.  Self-attention then does **SOFT RETRIEVAL**: It assossiates a weight (=attention score) to each $p_k$ reflecting its relevance to the $p_q$.
+5.  So, the output pixel is the weighted sum: $y_q=\sum^N_{k=1}a_k\cdot p_k, a_k\ge 0, \sum^N_{k=1}a_k=1$
+6.  Attention scores $a_k$ should be positive and sum up to $1$.
+7.  $a_k = <p_q, p_k>$, a similarity measure in vector space, a dot product. To make it positive and sum up to $1$, we do exponent and normalize by their sum (softmax): $a_k = \frac{e^{<p_q, p_k>}}{\sum^N_{i=1}e^{p_q, p_i}}=\text{softmax}_k\left(<p_q, p_k>\right)$
+8.  This is a definition of the output pixel (not complete, we will add relative position). However, this function is fixed, it's not learned. To make it learnable, we pass it through linear operations with learnable weights: $a_k =\text{softmax}_k\left(<Q\cdot p_q, K\cdot p_k>\right), y_q=\sum^N_{k=1}a_k\cdot V\cdot p_k$
+9.  Query pixel gets query matrix $Q$, key pixels share the same key matrix $K$, and the output pixel gets the final value matrix $V$.
+10. To add relative position information in this formula, we do variable change $\delta = k - q$ and add **relative position encoding** r*{\delta}: $a*{q + \delta} =\text{softmax}_\delta\left(<Q\cdot p_q, K\cdot p_{q+\delta}+r*{\delta}>\right), y_q=\sum^N*{k=1}a_k\cdot V\cdot p_k$
+11. See $r_{\delta}$ as telling the positions of other pixels, how far they are relative to the query pixel.
+12. Goal is to make attention scores only dependend on the relative position: $a_{q+\delta}=f_{Q, K}(r_{\delta})$, just like a convolutional kernel does.
+
+**ATTENTION IS A SUPERSET OF CONVOLUTIONAL**. It's a more general, less biased operation. Theorem: \*\*A multi-head self-attention layer with $N_k$ heads can express any convolutional layer of kernel size $\sqrt{N_h}\times\sqrt{N_h}$.
+
+1.  Multi-head attention means we run the attention algorithm multiple times in parallel, each time with different $Q, K, V$ parameters. E.g. Head 1: $Q_1, K_1, V_1$, Head 2: $Q_2, K_2, V_2$. That gives a model multiple points of view on the same query pixel. The theorem claims that for $3\times3$ kernel we will need $9$ self-attention heads. Note that with relative encoding, there exist a proof that such $Q, K$ exist that cancel out all image dependent terms in the dot product and keeps only the relative position term. What's left is a 1-hot pattern: each head only attends to $1$ relative position consistently across all images.
+2.  We can also visualze a heatmap of the attention scores for each query pixel.

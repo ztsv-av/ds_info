@@ -1,3 +1,20 @@
+# [E] Why Python slower than e.g. C++?
+
+C++ is faster than Python because:
+
+- Compiled -> no interpreter
+- Static typing -> no runtime checks
+- Lightweight primitive types:
+  - Python int = a full object with reference count, type pointer, dynamic allocation, metadata
+  - C++ int = just 4 bytes on the stack
+- No garbage collector (destruction is deterministic)
+- Highly optimized machine code
+- Fast function calls:
+  - Python has stack frame creation, argument parsing, python object creation
+- True multithreading:
+  - Python has GIL, which prevents multithreading
+  - C++ has native support for atomics, locks, memory ordering, parallelism
+
 # [E] You have three matrices: and you need to calculate the product. In what order would you perform your multiplication and why?
 
 Let A is pq, B is qr, C is rs. We have 2 possibilities: 1. A _ (B _ C) = pq * (qr*rs). Cost is (qrs) + pqs scalar multiplications. 2. (A _ B) _ C = (pq*qr) * rs. Cost is (pqr) + prs scalar multiplications. 3. With p=10, q=100, r=5, s=50, we have (qrs) + pqs = 75000, (pqr) + prs = 7500.
