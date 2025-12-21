@@ -113,3 +113,22 @@ def longestCommonPrefix(strs: List[str]) -> str:
         if not prefix:
             break
     return prefix
+
+def longestCommonPrefixV2(strs: List[str]) -> str:
+    if not strs:
+        return ""
+    
+    # use the shortest string as the base; no prefix can be longer than this
+    shortest = min(strs, key=len)
+    prefix_len = len(shortest)
+    
+    for s in strs:
+        i = 0
+        # compare up to current prefix_len
+        while i < prefix_len and s[i] == shortest[i]:
+            i += 1
+        prefix_len = i
+        if prefix_len == 0:
+            return ""
+    
+    return shortest[:prefix_len]
