@@ -198,3 +198,39 @@ Transformers have much lower bias, and much higher variance, owing to self-atten
 
 1.  Multi-head attention means we run the attention algorithm multiple times in parallel, each time with different $Q, K, V$ parameters. E.g. Head 1: $Q_1, K_1, V_1$, Head 2: $Q_2, K_2, V_2$. That gives a model multiple points of view on the same query pixel. The theorem claims that for $3\times3$ kernel we will need $9$ self-attention heads. Note that with relative encoding, there exist a proof that such $Q, K$ exist that cancel out all image dependent terms in the dot product and keeps only the relative position term. What's left is a 1-hot pattern: each head only attends to $1$ relative position consistently across all images.
 2.  We can also visualze a heatmap of the attention scores for each query pixel.
+
+# [E] Convolutional and transformer hybrids.
+
+In modern vision models, hybrid architectures usually refers to models that combine CNN blocks and Transformer blocks (or MLP-Mixers, SSMs, etc.) in a single forward pass, typically in a staged pipeline.
+
+Early stages of vision models (high-resolution feature maps) are extremely expensive for transformers.
+Self-attention scales as O(N²) in the number of pixels/tokens, so applying attention directly on 224×224 images is too costly.
+
+But CNNs are extremely efficient at:
+
+- low-level edge/texture detection
+- initial downsampling
+- local invariances
+- hierarchical spatial compression
+
+Thus, many SOTA or compute-efficient models:
+
+- Use CNNs to shrink resolution & build robust local features
+- Use Transformers or SSM layers after the resolution is reduced, where sequence lengths are manageable.
+
+This is the hybrid idea. Examples:
+
+1. Convolutional Vision Transformer
+2. Hybrid ViT
+3. Swin + CNN blocks in early stages
+4. SSMs + CNN front-end: When people use S4, Mamba, or other state-space models for vision, they almost always put conv stems before the SSM layers.
+
+You can also redesign CNNs to mimic transformer hyperparameters:
+
+- large kernel depthwise convolutions (7x7, 9x9)
+- LayerNorm instead of BatchNorm
+- inverted bottlenecks
+- similar channel scaling
+- residual layouts like transformers
+
+**Use CNNs where they are best (local features) and Transformers where they are best (global reasoning).**

@@ -42,3 +42,24 @@ def longest_increasing_subsequence(s: str = "abcadebf"):
     out = "".join(reversed(out))
     
     return best_len, out
+
+def longestPalindrome(s: str) -> str:
+    def isPalindrome(i: int, j: int):
+        left = i
+        right = j - 1
+        while left < right:
+            if s[left] != s[right]:
+                return False
+            left += 1
+            right -= 1
+        return True
+
+    if len(s) == 0 or len(s) == 1:
+        return s
+
+    for length in range(len(s), 0, -1):
+        for start in range(len(s) - length + 1):
+            if isPalindrome(start, start + length):
+                return s[start : start + length]
+
+    return ""
