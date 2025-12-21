@@ -1,3 +1,5 @@
+from typing import List
+
 def sum_equals_k(values: list = [3, 7, 15, -5, 0, 3, 2, 8, 5, 2, 1, 6, 4, -2, -3, -5, 17, 2], k: int = 8):
     """
     Given an array of integers and an integer k, find the total number of continuous subarrays whose sum equals k. 
@@ -68,3 +70,46 @@ def isPalindrome(x: int, solution_type: str) -> bool:
             reversed_half = reversed_half * 10 + x % 10
             x = x // 10
         return (x == reversed_half or x == reversed_half // 10)
+
+def romanToInt(s: str) -> int:
+    values = {
+        "M": 1000,
+        "D": 500,
+        "C": 100,
+        "L": 50,
+        "X": 10,
+        "V": 5,
+        "I": 1,
+    }
+
+    out = 0
+    prev_value = 0
+
+    for c in reversed(s):
+        curr_value = values[c]
+        if curr_value < prev_value:
+            out -= curr_value
+        else:
+            out += curr_value
+        prev_value = curr_value
+
+    return out
+
+def longestCommonPrefix(strs: List[str]) -> str:
+    if not strs:
+        return ""
+    
+    def helper(str1: str, str2: str) -> str:
+        if len(str1) > len(str2):
+            str1, str2 = str2, str1
+        i = 0
+        while i < len(str1) and str1[i] == str2[i]:
+            i += 1
+        return str1[:i]
+
+    prefix = strs[0]
+    for s in strs[1:]:
+        prefix = helper(prefix, s)
+        if not prefix:
+            break
+    return prefix
