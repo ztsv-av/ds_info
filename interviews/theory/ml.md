@@ -169,7 +169,7 @@ Zero-shot, one-shot, and few-shot learning describe how a model performs a task 
 - [H] How do you validate whether your hypotheses are correct?
 - [M] Imagine your hypotheses about the causes are correct. What would you do to address them?
 
-# [H] Why transformers replace CNNs?
+# [H] How CNNs differ from ViTs?
 
 CNNs take input image, process it using convolutional layers and pooling layers. Convolutional layers process input data using filters (=kernels), e.g. 3x3 filter. CNN layer takes an input, processes 3x3 area of the input using weights of the filter and outputs 1x1 pixel. Each layer can have many of those filters, they are dimensions. For example, RGB image has 3 dimensions. First layer in CNN can have 4 kernels, each dimension representing input differently, e.g. 1st dim focusing on vertical shapes, 2nd dim focusing on horizontal shapes, etc. The deeper in the network, the less general features become (from shapes to details, such as eyes, lips).
 
