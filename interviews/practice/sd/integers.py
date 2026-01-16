@@ -132,3 +132,78 @@ def longestCommonPrefixV2(strs: List[str]) -> str:
             return ""
     
     return shortest[:prefix_len]
+
+def reverseInteger(x: int):
+    neg = x < 0
+    x = abs(x)
+
+    out = 0
+    while x != 0:
+        out = out * 10 + x % 10
+        if out > 2**31 - 1:
+            return 0
+        x //= 10
+
+    return -out if neg else out
+
+def intToRoman(num: int):
+
+    vals   = [1000, 900, 500, 400, 100, 90,  50, 40,  10, 9,  5, 4, 1]
+    roman  = ["M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"]
+
+    res = []
+    for v, s in zip(vals, roman):
+        while num >= v:
+            num -= v
+            res.append(s)
+    return "".join(res)
+
+    # counts = {}
+    # i = 0
+    # while num != 0:
+    #     counts[i] = counts.get(i, 0) + num % 10
+    #     num = num // 10
+    #     i += 1
+    
+    # out = []
+    # for key, value in reversed(counts.items()):
+    #     if key == 3: # thousands
+    #         out.append("M" * value)
+    #     elif key == 2: # hundreds
+    #         if value == 9: # CM
+    #             out.append("CM")
+    #         elif value == 4: # CD
+    #             out.append("CD")
+    #         else:
+    #             if value <= 3:
+    #                 out.append("C" * value)
+    #             else:
+    #                 out.append("D")
+    #                 left = value - 5
+    #                 out.append("C" * left)
+    #     elif key == 1: # tens
+    #         if value == 9: # XC
+    #             out.append("XC")
+    #         elif value == 4: # XL
+    #             out.append("XL")
+    #         else:
+    #             if value <= 3:
+    #                 out.append("X" * value)
+    #             else:
+    #                 out.append("L")
+    #                 left = value - 5
+    #                 out.append("X" * left)
+    #     else: # ones
+    #         if value == 9: # IX
+    #             out.append("IX")
+    #         elif value == 4: # IV
+    #             out.append("IV")
+    #         else:
+    #             if value <= 3:
+    #                 out.append("I" * value)
+    #             else:
+    #                 out.append("V")
+    #                 left = value - 5
+    #                 out.append("I" * left)
+    
+    # return "".join(out)

@@ -17,7 +17,7 @@
 
 # Empirical Risk Minimization
 
-1. [E] What’s the risk in empirical risk minimization?
+1. [E] What's the risk in empirical risk minimization?
    1. Risk is the expected loss of the model on data drawn from true (unknown) distribution: $R(f) = E_{x,y \approx P}[L(f(x),y)]$
 2. [E] Why is it empirical?
    1. Since we cannout compute expected value, because we don't know true distribution, we approximate it using mean: $R(f) = \sum^i_n\frac{1}{n}L(f(x_i),y_i)$
@@ -56,7 +56,7 @@ Deep NN. In wide NN, it learns just 1 function. In deep NN, it learns multiple f
 4. First layers -> detailed features, future layers -> general features.
 5. Theory: there exist functions that can be represented by deep NN with $O(n)$ parameters, but require $O(exp(n))$ parameters in wide NN.
 
-# [H] The Universal Approximation Theorem states that a neural network with 1 hidden layer can approximate any continuous function for inputs within a specific range. Then why can’t a simple neural network reach an arbitrarily small positive error?
+# [H] The Universal Approximation Theorem states that a neural network with 1 hidden layer can approximate any continuous function for inputs within a specific range. Then why can't a simple neural network reach an arbitrarily small positive error?
 
 In theory it's true, but in practice it doesn't work like that.
 
@@ -97,7 +97,7 @@ In theory it's true, but in practice it doesn't work like that.
 
 # Parametric vs. Non-parametric Methods
 
-1. [E] What’s the difference between parametric methods and non-parametric methods? Give an example of each method.
+1. [E] What's the difference between parametric methods and non-parametric methods? Give an example of each method.
    1. Parametric methods assume a specific functional form for the data distribution or the relationship between inputs and outputs. They are characterized by a fixed, finite set of parameters whose number does not grow with the amount of data. E.g. linear regression, neural networks. Non-parametric methods do not assume a fixed functional form. Model complexity can grow with the amount of data, allowing them to adapt more flexibly to the underlying structure. Examples are decision trees (can grow in depth and number of nodes as more data is available), kernel density estimation, KNN.
 2. [H] When should we use one and when should we use the other?
    1. Parametric:
@@ -113,11 +113,11 @@ In theory it's true, but in practice it doesn't work like that.
 
 Ensembling independently trained models improves performance because it changes the bias–variance–covariance structure of the predictor. For a fixed input, the expected squared error of an ensemble average decomposes into the average individual model variance minus the average pairwise covariance of their errors. When models are trained with different random seeds, data subsamples, architectures, or optimization trajectories, their errors are only partially correlated. Averaging therefore cancels individual errors while preserving signal, reducing variance more than it reduces bias.
 
-In modern deep learning, independently trained networks often converge to different regions of the loss landscape that encode different inductive biases. Averaging their predictions effectively aggregates multiple hypotheses, smoothing sharp decision boundaries and sometimes lowering bias as well. Overall, the ensemble’s error is typically lower than that of any voter model because it benefits from reduced variance, reduced error correlation, and mild bias correction.
+In modern deep learning, independently trained networks often converge to different regions of the loss landscape that encode different inductive biases. Averaging their predictions effectively aggregates multiple hypotheses, smoothing sharp decision boundaries and sometimes lowering bias as well. Overall, the ensemble's error is typically lower than that of any voter model because it benefits from reduced variance, reduced error correlation, and mild bias correction.
 
-# [E] Why does an ML model’s performance degrade in production?
+# [E] Why does an ML model's performance degrade in production?
 
-A production model degrades because the real-world data and conditions gradually diverge from those seen during training. This includes model staleness from new patterns not present in training, data drift (feature distribution shift), label drift (only distribution of the target variable changes over time), concept drift (mapping from features to labels changes), pipeline inconsistencies, and feedback loops (e.g. user-behavior changes). As the mapping from inputs to outputs changes, the model’s learned decision boundary becomes outdated. Effective mitigation requires monitoring, drift detection, and periodic retraining, not continuous fine-tuning in production.
+A production model degrades because the real-world data and conditions gradually diverge from those seen during training. This includes model staleness from new patterns not present in training, data drift (feature distribution shift), label drift (only distribution of the target variable changes over time), concept drift (mapping from features to labels changes), pipeline inconsistencies, and feedback loops (e.g. user-behavior changes). As the mapping from inputs to outputs changes, the model's learned decision boundary becomes outdated. Effective mitigation requires monitoring, drift detection, and periodic retraining, not continuous fine-tuning in production.
 
 # [M] Why does L1 regularization tend to lead to sparsity while L2 regularization pushes weights closer to 0?
 
@@ -166,8 +166,40 @@ Zero-shot, one-shot, and few-shot learning describe how a model performs a task 
 # Your model performs really well on the test set but poorly in production.
 
 - [M] What are your hypotheses about the causes?
+  - Distribution, concept shift:
+    - Prod input distribution is different from train/test.
+    - Concept drift: the relationship between features and target changed
+  - Evaluation mismatch:
+    - Offline metric (e.g., log-loss, RMSE, AUC) is not aligned with the business KPI used to judge prod performance (e.g., revenue, retention)
+    - Test set sampling doesn't reflect prod traffic (e.g., test is balanced, prod is heavily skewed)
+  - Offline–online data pipeline mismatch:
+    - Feature definitions differ between training/test and production (e.g., different aggregations, time windows, or encodings)
+    - Missing features in prod (nulls / default values) that never appear in your test set
+    - Data leakage used in train/test.
+  - Label / ground-truth issues in production:
+    - Noisy or biased labels in prod (e.g., only some users give feedback, or labels depend on previous model behavior).
+  - Implementation bugs (wrong model checkpoint, numeric or type issues, etc.)
+  - Environment issues (latency, stale features, predictions based on outdated context, model changes user behavior).
 - [H] How do you validate whether your hypotheses are correct?
+  - Check for distribution / concept shift:
+    - Compare train/test vs prod feature distributions
+  - Backtest: take a recent slice of prod data (with labels, once available) and evaluate the model offline on that slice.
+  - Validate offline–online pipeline consistency:
+    - Log raw inputs and final feature vectors in prod and in your offline pipeline for the same examples; diff them.
 - [M] Imagine your hypotheses about the causes are correct. What would you do to address them?
+  - Redesign your test set to mirror prod distribution (same class balance, same user mix, same time period).
+  - If distribution / concept shift is the main cause:
+    - Retrain or fine-tune regularly on fresh data, possibly with a time-based validation scheme.
+    - Build multiple models per segment or introduce features that explicitly encode the changing context (time, campaign, region, etc.).
+    - Set up continuous monitoring and automatic alerts for drift.
+  - If pipeline mismatch / leakage is the cause:
+    - Make the offline and online feature pipelines share code or use a single feature store.
+    - Remove any features that use future or post-outcome information; rebuild training data with the same constraints as prod.
+    - Re-train the model with the cleaned feature set and revalidate.
+  - If label issues are the cause:
+    - Redefine the target to match what you can reliably observe in prod
+    - Use methods robust to label noise (loss clipping, sample weighting, label smoothing, etc.).
+  - If evaluation mismatch is the cause: Re-align your offline objective: train and tune using a metric that correlates with the real business KPI.
 
 # [H] How CNNs differ from ViTs?
 

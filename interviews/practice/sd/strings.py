@@ -63,3 +63,32 @@ def longestPalindrome(s: str) -> str:
                 return s[start : start + length]
 
     return ""
+
+def atoi(s: str):
+    s = s.lstrip()
+    if not s:
+        return 0
+
+    INT_MIN, INT_MAX = -2**31, 2**31 - 1
+
+    i = 0
+    sign = 1
+
+    # sign
+    if s[i] in "+-":
+        if s[i] == "-":
+            sign = -1
+        i += 1
+
+    num = 0
+    while i < len(s) and s[i].isdigit():
+        digit = ord(s[i]) - ord("0")
+
+        # overflow check before updating num
+        if num > (INT_MAX - digit) // 10:
+            return INT_MIN if sign == -1 else INT_MAX
+
+        num = num * 10 + digit
+        i += 1
+
+    return sign * num
