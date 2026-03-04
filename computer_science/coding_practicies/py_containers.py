@@ -3,7 +3,8 @@ import json
 
 type Data = list[dict[str, Any]]
 
-# === Interfaces ===
+
+# Interfaces
 class DataLoader(Protocol):
     def load(self) -> Data: ...
 
@@ -16,7 +17,7 @@ class Exporter(Protocol):
     def export(self, data: Data) -> None: ...
 
 
-# === Concrete implementations ===
+# Concrete implementations
 class InMemoryLoader:
     def load(self) -> Data:
         return [
@@ -40,7 +41,7 @@ class JSONExporter:
             json.dump(data, f, indent=2)
 
 
-# === Pipeline ===
+# Pipeline
 class DataPipeline:
     def __init__(self, loader: DataLoader, transformer: Transformer, exporter: Exporter):
         self.loader = loader
@@ -53,7 +54,7 @@ class DataPipeline:
         self.exporter.export(clean)
 
 
-# === Simple DI container ===
+# Simple DI container
 class Container:
     def __init__(self) -> None:
         self._providers: dict[str, tuple[Callable[[], Any], bool]] = {}
@@ -78,7 +79,7 @@ class Container:
         return instance
 
 
-# === Main runner ===
+# Main runner
 def main() -> None:
     container = Container()
 
@@ -86,11 +87,14 @@ def main() -> None:
     container.register("transformer", lambda: CleanMissingFields())
     container.register("exporter", lambda: JSONExporter("output.json"))
 
-    container.register("pipeline", lambda: DataPipeline(
-        loader=container.resolve("loader"),
-        transformer=container.resolve("transformer"),
-        exporter=container.resolve("exporter"),
-    ))
+    container.register(
+        "pipeline",
+        lambda: DataPipeline(
+            loader=container.resolve("loader"),
+            transformer=container.resolve("transformer"),
+            exporter=container.resolve("exporter"),
+        ),
+    )
 
     pipeline: DataPipeline = container.resolve("pipeline")
     pipeline.run()

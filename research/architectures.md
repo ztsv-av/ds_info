@@ -1,0 +1,8 @@
+- CNN (Convolutional Neural Networks)
+- RNN / LSTM
+- DenseNet
+- ConvLSTM
+- Transformers / Attention
+- Seq2Seq
+- Graph Neural Networks
+- Hybrid Physics-ML Networks
