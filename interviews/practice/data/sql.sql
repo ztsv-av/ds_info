@@ -316,3 +316,12 @@ WHERE cnt >= 3
 SELECT p.product_name, s.year, s.price
 FROM Sales s
 LEFT JOIN Product p ON s.product_id = p.product_id
+
+
+-- 1075. Project Employees I
+SELECT p.project_id, ROUND(AVG(e.experience_years)::numeric, 2) AS average_years
+FROM Project p
+JOIN Employee e
+    ON p.employee_id = e.employee_id
+GROUP BY p.project_id
+ORDER BY p.project_id DESC
